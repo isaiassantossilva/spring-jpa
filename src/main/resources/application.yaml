@@ -1,0 +1,17 @@
+spring:
+  application:
+    name: spring-jpa
+  # Flyway fica desligado por padrao: os testes H2 usam o schema gerado pelo
+  # Hibernate (create-drop). O teste com PostgreSQL/Testcontainers liga o
+  # Flyway e usa as migracoes de db/migration (fluxo de producao).
+  flyway:
+    enabled: false
+  h2:
+    console:
+      enabled: true
+  jpa:
+    open-in-view: false
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
