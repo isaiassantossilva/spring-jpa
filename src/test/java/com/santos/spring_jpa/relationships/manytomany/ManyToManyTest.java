@@ -26,26 +26,26 @@ class ManyToManyTest {
 
 	@BeforeEach
 	void setUp() {
-		Course jpa = courseRepository.save(new Course("JPA"));
-		Course spring = courseRepository.save(new Course("Spring"));
+		Course jpa = this.courseRepository.save(new Course("JPA"));
+		Course spring = this.courseRepository.save(new Course("Spring"));
 
 		Student alice = new Student("Alice");
 		alice.enroll(jpa);
 		alice.enroll(spring);
-		aliceId = studentRepository.save(alice).getId();
+		this.aliceId = this.studentRepository.save(alice).getId();
 
 		Student bruno = new Student("Bruno");
 		bruno.enroll(jpa);
-		studentRepository.save(bruno);
+		this.studentRepository.save(bruno);
 
-		em.flush();
-		em.clear();
+		this.em.flush();
+		this.em.clear();
 	}
 
 	@Test
 	@DisplayName("associacoes sao gravadas na join table e recarregadas")
 	void persistsAssociations() {
-		Student alice = studentRepository.findById(aliceId).orElseThrow();
+		Student alice = this.studentRepository.findById(this.aliceId).orElseThrow();
 
 		assertThat(alice.getCourses())
 				.extracting(Course::getTitle)
@@ -55,7 +55,7 @@ class ManyToManyTest {
 	@Test
 	@DisplayName("query method com join implicito (findByCoursesTitle)")
 	void findStudentsByCourse() {
-		assertThat(studentRepository.findByCoursesTitle("JPA"))
+		assertThat(this.studentRepository.findByCoursesTitle("JPA"))
 				.extracting(Student::getName)
 				.containsExactlyInAnyOrder("Alice", "Bruno");
 	}
@@ -63,17 +63,17 @@ class ManyToManyTest {
 	@Test
 	@DisplayName("remover a matricula apaga so a linha da join table, nao o curso")
 	void removingAssociationKeepsCourse() {
-		Student alice = studentRepository.findById(aliceId).orElseThrow();
+		Student alice = this.studentRepository.findById(this.aliceId).orElseThrow();
 		Course jpa = alice.getCourses().stream()
 				.filter(c -> c.getTitle().equals("JPA"))
 				.findFirst().orElseThrow();
 
 		alice.unenroll(jpa);
-		em.flush();
-		em.clear();
+		this.em.flush();
+		this.em.clear();
 
-		assertThat(courseRepository.count()).isEqualTo(2);
-		assertThat(studentRepository.findById(aliceId).orElseThrow().getCourses())
+		assertThat(this.courseRepository.count()).isEqualTo(2);
+		assertThat(this.studentRepository.findById(this.aliceId).orElseThrow().getCourses())
 				.extracting(Course::getTitle)
 				.containsExactly("Spring");
 	}

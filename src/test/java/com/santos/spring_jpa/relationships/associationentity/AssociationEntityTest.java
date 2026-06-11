@@ -32,23 +32,23 @@ class AssociationEntityTest {
 
 	@BeforeEach
 	void setUp() {
-		ana = developerRepository.save(new Developer("Ana"));
-		Developer beto = developerRepository.save(new Developer("Beto"));
-		portal = projectRepository.save(new Project("Portal"));
-		Project api = projectRepository.save(new Project("API"));
+		this.ana = this.developerRepository.save(new Developer("Ana"));
+		Developer beto = this.developerRepository.save(new Developer("Beto"));
+		this.portal = this.projectRepository.save(new Project("Portal"));
+		Project api = this.projectRepository.save(new Project("API"));
 
-		assignmentRepository.save(new Assignment(ana, portal, "tech-lead", LocalDate.of(2026, 1, 10)));
-		assignmentRepository.save(new Assignment(ana, api, "dev", LocalDate.of(2026, 3, 1)));
-		assignmentRepository.save(new Assignment(beto, portal, "dev", LocalDate.of(2026, 2, 5)));
-		em.flush();
-		em.clear();
+		this.assignmentRepository.save(new Assignment(this.ana, this.portal, "tech-lead", LocalDate.of(2026, 1, 10)));
+		this.assignmentRepository.save(new Assignment(this.ana, api, "dev", LocalDate.of(2026, 3, 1)));
+		this.assignmentRepository.save(new Assignment(beto, this.portal, "dev", LocalDate.of(2026, 2, 5)));
+		this.em.flush();
+		this.em.clear();
 	}
 
 	@Test
 	@DisplayName("a chave composta e derivada das duas associacoes")
 	void compositeKeyDerivedFromAssociations() {
-		Assignment assignment = assignmentRepository
-				.findById(new AssignmentId(ana.getId(), portal.getId()))
+		Assignment assignment = this.assignmentRepository
+				.findById(new AssignmentId(this.ana.getId(), this.portal.getId()))
 				.orElseThrow();
 
 		assertThat(assignment.getDeveloper().getName()).isEqualTo("Ana");
@@ -58,7 +58,7 @@ class AssociationEntityTest {
 	@Test
 	@DisplayName("as colunas extras (role, assignedAt) ficam na associacao")
 	void extraColumnsLiveOnAssociation() {
-		assertThat(assignmentRepository.findByRole("tech-lead"))
+		assertThat(this.assignmentRepository.findByRole("tech-lead"))
 				.singleElement()
 				.satisfies(a -> {
 					assertThat(a.getDeveloper().getName()).isEqualTo("Ana");
@@ -69,11 +69,11 @@ class AssociationEntityTest {
 	@Test
 	@DisplayName("navegacao nos dois sentidos via query methods")
 	void queryFromBothSides() {
-		assertThat(assignmentRepository.findByDeveloperName("Ana"))
+		assertThat(this.assignmentRepository.findByDeveloperName("Ana"))
 				.extracting(a -> a.getProject().getTitle())
 				.containsExactlyInAnyOrder("Portal", "API");
 
-		assertThat(assignmentRepository.findByProjectTitle("Portal"))
+		assertThat(this.assignmentRepository.findByProjectTitle("Portal"))
 				.extracting(a -> a.getDeveloper().getName())
 				.containsExactlyInAnyOrder("Ana", "Beto");
 	}
@@ -81,11 +81,11 @@ class AssociationEntityTest {
 	@Test
 	@DisplayName("remover a associacao nao apaga developer nem project")
 	void deletingAssignmentKeepsBothSides() {
-		assignmentRepository.deleteById(new AssignmentId(ana.getId(), portal.getId()));
-		em.flush();
+		this.assignmentRepository.deleteById(new AssignmentId(this.ana.getId(), this.portal.getId()));
+		this.em.flush();
 
-		assertThat(assignmentRepository.count()).isEqualTo(2);
-		assertThat(developerRepository.count()).isEqualTo(2);
-		assertThat(projectRepository.count()).isEqualTo(2);
+		assertThat(this.assignmentRepository.count()).isEqualTo(2);
+		assertThat(this.developerRepository.count()).isEqualTo(2);
+		assertThat(this.projectRepository.count()).isEqualTo(2);
 	}
 }

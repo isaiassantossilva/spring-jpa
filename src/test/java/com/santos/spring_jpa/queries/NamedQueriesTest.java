@@ -23,15 +23,15 @@ class NamedQueriesTest {
 
 	@BeforeEach
 	void seed() {
-		repository.save(new Employee("Alice", "alice@corp.com", "IT", new BigDecimal("9000.00"), LocalDate.of(2020, 1, 15)));
-		repository.save(new Employee("Bob", "bob@corp.com", "IT", new BigDecimal("5000.00"), LocalDate.of(2021, 3, 10)));
-		repository.save(new Employee("Carol", "carol@corp.com", "HR", new BigDecimal("7000.00"), LocalDate.of(2019, 7, 1)));
+		this.repository.save(new Employee("Alice", "alice@corp.com", "IT", new BigDecimal("9000.00"), LocalDate.of(2020, 1, 15)));
+		this.repository.save(new Employee("Bob", "bob@corp.com", "IT", new BigDecimal("5000.00"), LocalDate.of(2021, 3, 10)));
+		this.repository.save(new Employee("Carol", "carol@corp.com", "HR", new BigDecimal("7000.00"), LocalDate.of(2019, 7, 1)));
 	}
 
 	@Test
 	@DisplayName("@NamedQuery: o metodo do repositorio casa com o nome declarado na entidade")
 	void namedJpqlQuery() {
-		assertThat(repository.findEarningMoreThan(new BigDecimal("6000")))
+		assertThat(this.repository.findEarningMoreThan(new BigDecimal("6000")))
 				.extracting(Employee::getName)
 				.containsExactly("Alice", "Carol");
 	}
@@ -39,7 +39,7 @@ class NamedQueriesTest {
 	@Test
 	@DisplayName("@NamedNativeQuery + @SqlResultSetMapping projeta SQL nativo no record")
 	void namedNativeQueryWithMapping() {
-		assertThat(repository.findSummariesNative("IT"))
+		assertThat(this.repository.findSummariesNative("IT"))
 				.containsExactlyInAnyOrder(
 						new EmployeeSummary("Alice", new BigDecimal("9000.00")),
 						new EmployeeSummary("Bob", new BigDecimal("5000.00")));

@@ -25,10 +25,10 @@ class CollectionOrderingTest {
 	void orderColumnKeepsListOrder() {
 		Playlist playlist = new Playlist("Rock");
 		playlist.getTracks().addAll(List.of("Intro", "Refrao", "Solo", "Final"));
-		Long id = repository.saveAndFlush(playlist).getId();
-		em.clear();
+		Long id = this.repository.saveAndFlush(playlist).getId();
+		this.em.clear();
 
-		Playlist reloaded = repository.findById(id).orElseThrow();
+		Playlist reloaded = this.repository.findById(id).orElseThrow();
 		assertThat(reloaded.getTracks()).containsExactly("Intro", "Refrao", "Solo", "Final");
 	}
 
@@ -37,15 +37,15 @@ class CollectionOrderingTest {
 	void orderColumnTracksReordering() {
 		Playlist playlist = new Playlist("Mutavel");
 		playlist.getTracks().addAll(List.of("A", "B", "C"));
-		Long id = repository.saveAndFlush(playlist).getId();
+		Long id = this.repository.saveAndFlush(playlist).getId();
 
-		Playlist managed = repository.findById(id).orElseThrow();
+		Playlist managed = this.repository.findById(id).orElseThrow();
 		managed.getTracks().remove("B");
 		managed.getTracks().addFirst("Z");
-		em.flush();
-		em.clear();
+		this.em.flush();
+		this.em.clear();
 
-		assertThat(repository.findById(id).orElseThrow().getTracks())
+		assertThat(this.repository.findById(id).orElseThrow().getTracks())
 				.containsExactly("Z", "A", "C");
 	}
 
@@ -57,10 +57,10 @@ class CollectionOrderingTest {
 		playlist.addSong(new Song("Ruim", 1));
 		playlist.addSong(new Song("Otima", 5));
 		playlist.addSong(new Song("Boa", 5));
-		Long id = repository.saveAndFlush(playlist).getId();
-		em.clear();
+		Long id = this.repository.saveAndFlush(playlist).getId();
+		this.em.clear();
 
-		Playlist reloaded = repository.findById(id).orElseThrow();
+		Playlist reloaded = this.repository.findById(id).orElseThrow();
 		assertThat(reloaded.getSongs())
 				.extracting(Song::getTitle)
 				.containsExactly("Boa", "Otima", "Mediana", "Ruim");

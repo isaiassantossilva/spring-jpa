@@ -22,12 +22,12 @@ public class EmployeeApiService {
 
 	@Transactional(readOnly = true)
 	public Page<EmployeeResponse> list(Pageable pageable) {
-		return repository.findAll(pageable).map(EmployeeResponse::from);
+		return this.repository.findAll(pageable).map(EmployeeResponse::from);
 	}
 
 	@Transactional(readOnly = true)
 	public EmployeeResponse get(Long id) {
-		return repository.findById(id)
+		return this.repository.findById(id)
 				.map(EmployeeResponse::from)
 				.orElseThrow(() -> new ResponseStatusException(
 						HttpStatus.NOT_FOUND, "funcionario %d nao existe".formatted(id)));
@@ -35,7 +35,7 @@ public class EmployeeApiService {
 
 	@Transactional
 	public EmployeeResponse create(EmployeeRequest request) {
-		Employee saved = repository.save(new Employee(
+		Employee saved = this.repository.save(new Employee(
 				request.name(), request.email(), request.department(),
 				request.salary(), request.hireDate()));
 		return EmployeeResponse.from(saved);

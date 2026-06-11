@@ -27,7 +27,7 @@ class AuditingTest {
 	@Test
 	@DisplayName("@CreatedDate e @LastModifiedDate sao preenchidos no insert")
 	void populatesAuditFieldsOnInsert() {
-		TaskItem task = repository.saveAndFlush(new TaskItem("Estudar JPA"));
+		TaskItem task = this.repository.saveAndFlush(new TaskItem("Estudar JPA"));
 
 		assertThat(task.getCreatedAt()).isNotNull();
 		assertThat(task.getUpdatedAt()).isNotNull();
@@ -36,7 +36,7 @@ class AuditingTest {
 	@Test
 	@DisplayName("@CreatedBy/@LastModifiedBy vem do AuditorAware")
 	void populatesAuditor() {
-		TaskItem task = repository.saveAndFlush(new TaskItem("Estudar auditoria"));
+		TaskItem task = this.repository.saveAndFlush(new TaskItem("Estudar auditoria"));
 
 		assertThat(task.getCreatedBy()).isEqualTo("test-user");
 		assertThat(task.getUpdatedBy()).isEqualTo("test-user");
@@ -45,13 +45,13 @@ class AuditingTest {
 	@Test
 	@DisplayName("@LastModifiedDate avanca no update; @CreatedDate nao muda")
 	void updatesLastModifiedOnUpdate() throws InterruptedException {
-		TaskItem task = repository.saveAndFlush(new TaskItem("Estudar JPA"));
+		TaskItem task = this.repository.saveAndFlush(new TaskItem("Estudar JPA"));
 		var createdAt = task.getCreatedAt();
 		var firstUpdatedAt = task.getUpdatedAt();
 
 		Thread.sleep(50);
 		task.setDone(true);
-		em.flush();
+		this.em.flush();
 
 		assertThat(task.getCreatedAt()).isEqualTo(createdAt);
 		assertThat(task.getUpdatedAt()).isAfter(firstUpdatedAt);

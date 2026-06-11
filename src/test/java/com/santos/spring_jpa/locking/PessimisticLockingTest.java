@@ -36,14 +36,14 @@ class PessimisticLockingTest {
 
 	@AfterEach
 	void cleanUp() {
-		repository.deleteAll();
+		this.repository.deleteAll();
 	}
 
 	@Test
 	@DisplayName("SELECT FOR UPDATE serializa read-modify-write concorrente (sem lost update)")
 	void concurrentIncrementsAreSerialized() throws Exception {
-		TransactionTemplate tx = new TransactionTemplate(transactionManager);
-		tx.executeWithoutResult(s -> repository.save(new Account("concorrente", new BigDecimal("100.00"))));
+		TransactionTemplate tx = new TransactionTemplate(this.transactionManager);
+		tx.executeWithoutResult(s -> this.repository.save(new Account("concorrente", new BigDecimal("100.00"))));
 
 		int workers = 4;
 		try (ExecutorService pool = Executors.newFixedThreadPool(workers)) {
@@ -51,7 +51,7 @@ class PessimisticLockingTest {
 			for (int i = 0; i < workers; i++) {
 				futures.add(pool.submit(() -> tx.executeWithoutResult(s -> {
 					// bloqueia a linha ate o commit; os demais workers esperam
-					Account account = repository.findWithLockByOwner("concorrente").orElseThrow();
+					Account account = this.repository.findWithLockByOwner("concorrente").orElseThrow();
 					account.setBalance(account.getBalance().add(new BigDecimal("50.00")));
 				})));
 			}
@@ -60,7 +60,7 @@ class PessimisticLockingTest {
 			}
 		}
 
-		Account result = tx.execute(s -> repository.findWithLockByOwner("concorrente").orElseThrow());
+		Account result = tx.execute(s -> this.repository.findWithLockByOwner("concorrente").orElseThrow());
 		// 100 + 4 x 50: nenhum incremento foi perdido
 		assertThat(result.getBalance()).isEqualByComparingTo("300.00");
 	}

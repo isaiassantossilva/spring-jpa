@@ -23,7 +23,7 @@ public class EmployeeRepositoryCustomImpl implements EmployeeRepositoryCustom {
 
 	@Override
 	public List<Employee> search(String department, BigDecimal minSalary, Boolean active) {
-		CriteriaBuilder cb = em.getCriteriaBuilder();
+		CriteriaBuilder cb = this.em.getCriteriaBuilder();
 		CriteriaQuery<Employee> query = cb.createQuery(Employee.class);
 		Root<Employee> employee = query.from(Employee.class);
 
@@ -42,6 +42,6 @@ public class EmployeeRepositoryCustomImpl implements EmployeeRepositoryCustom {
 				.where(predicates.toArray(Predicate[]::new))
 				.orderBy(cb.asc(employee.get("name")));
 
-		return em.createQuery(query).getResultList();
+		return this.em.createQuery(query).getResultList();
 	}
 }

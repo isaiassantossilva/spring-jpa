@@ -27,9 +27,9 @@ class QueryByExampleTest {
 
 	@BeforeEach
 	void seed() {
-		repository.save(new Employee("Alice", "alice@corp.com", "IT", new BigDecimal("9000.00"), LocalDate.of(2020, 1, 15)));
-		repository.save(new Employee("Bob", "bob@corp.com", "IT", new BigDecimal("5000.00"), LocalDate.of(2021, 3, 10)));
-		repository.save(new Employee("Carol", "carol@corp.com", "HR", new BigDecimal("7000.00"), LocalDate.of(2019, 7, 1)));
+		this.repository.save(new Employee("Alice", "alice@corp.com", "IT", new BigDecimal("9000.00"), LocalDate.of(2020, 1, 15)));
+		this.repository.save(new Employee("Bob", "bob@corp.com", "IT", new BigDecimal("5000.00"), LocalDate.of(2021, 3, 10)));
+		this.repository.save(new Employee("Carol", "carol@corp.com", "HR", new BigDecimal("7000.00"), LocalDate.of(2019, 7, 1)));
 	}
 
 	@Test
@@ -40,9 +40,9 @@ class QueryByExampleTest {
 
 		Example<Employee> example = Example.of(probe, ExampleMatcher.matching().withIgnorePaths("active"));
 
-		assertThat(repository.findAll(example))
+		assertThat(this.repository.findAll(example))
 				.extracting(Employee::getName).containsExactlyInAnyOrder("Alice", "Bob");
-		assertThat(repository.count(example)).isEqualTo(2);
+		assertThat(this.repository.count(example)).isEqualTo(2);
 	}
 
 	@Test
@@ -55,7 +55,7 @@ class QueryByExampleTest {
 				.withIgnorePaths("active")
 				.withMatcher("name", contains().ignoreCase());
 
-		assertThat(repository.findOne(Example.of(probe, matcher)))
+		assertThat(this.repository.findOne(Example.of(probe, matcher)))
 				.isPresent()
 				.get().extracting(Employee::getName).isEqualTo("Alice");
 	}

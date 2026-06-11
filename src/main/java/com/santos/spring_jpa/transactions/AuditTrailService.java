@@ -22,7 +22,7 @@ public class AuditTrailService {
 	 */
 	@Transactional(propagation = Propagation.REQUIRES_NEW)
 	public void logAttempt(String message) {
-		repository.save(new LedgerEntry("audit: " + message));
+		this.repository.save(new LedgerEntry("audit: " + message));
 	}
 
 	/**
@@ -38,7 +38,7 @@ public class AuditTrailService {
 	/** MANDATORY: exige transacao existente; sem ela, IllegalTransactionStateException. */
 	@Transactional(propagation = Propagation.MANDATORY)
 	public void requiresExistingTransaction() {
-		repository.save(new LedgerEntry("mandatory"));
+		this.repository.save(new LedgerEntry("mandatory"));
 	}
 
 	/** NEVER: o oposto — falha se HOUVER transacao ativa. */

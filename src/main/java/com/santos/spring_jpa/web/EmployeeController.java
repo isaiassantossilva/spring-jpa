@@ -28,17 +28,17 @@ public class EmployeeController {
 
 	@GetMapping
 	public PagedModel<EmployeeResponse> list(Pageable pageable) {
-		return new PagedModel<>(service.list(pageable));
+		return new PagedModel<>(this.service.list(pageable));
 	}
 
 	@GetMapping("/{id}")
 	public EmployeeResponse get(@PathVariable Long id) {
-		return service.get(id);
+		return this.service.get(id);
 	}
 
 	@PostMapping
 	public ResponseEntity<EmployeeResponse> create(@Valid @RequestBody EmployeeRequest request) {
-		EmployeeResponse created = service.create(request);
+		EmployeeResponse created = this.service.create(request);
 		return ResponseEntity
 				.created(URI.create("/api/employees/" + created.id()))
 				.body(created);

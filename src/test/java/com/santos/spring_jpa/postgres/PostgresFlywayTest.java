@@ -50,7 +50,7 @@ class PostgresFlywayTest {
 	@Test
 	@DisplayName("o Flyway aplicou as migracoes e registrou no flyway_schema_history")
 	void flywayAppliedMigrations() {
-		List<?> history = em.createNativeQuery(
+		List<?> history = this.em.createNativeQuery(
 						"select version, description, success from flyway_schema_history order by installed_rank")
 				.getResultList();
 
@@ -64,8 +64,8 @@ class PostgresFlywayTest {
 	@Test
 	@DisplayName("os dados de seed da V2 estao disponiveis")
 	void seedDataIsAvailable() {
-		assertThat(repository.count()).isEqualTo(3);
-		assertThat(repository.findByDepartment("IT"))
+		assertThat(this.repository.count()).isEqualTo(3);
+		assertThat(this.repository.findByDepartment("IT"))
 				.extracting(Employee::getName)
 				.containsExactlyInAnyOrder("Alice", "Bob");
 	}
@@ -73,19 +73,19 @@ class PostgresFlywayTest {
 	@Test
 	@DisplayName("o repositorio funciona igual contra o PostgreSQL real")
 	void repositoryWorksAgainstRealPostgres() {
-		Employee saved = repository.save(
+		Employee saved = this.repository.save(
 				new Employee("Dora", "dora@corp.com", "Sales", new BigDecimal("6500.00"), LocalDate.of(2024, 5, 2)));
 
 		assertThat(saved.getId()).isNotNull();
-		assertThat(repository.findByNameContainingIgnoreCase("DORA")).hasSize(1);
+		assertThat(this.repository.findByNameContainingIgnoreCase("DORA")).hasSize(1);
 		// query nativa: '||' tambem e concatenacao no PostgreSQL
-		assertThat(repository.findByEmailDomain("@corp.com")).hasSize(4);
+		assertThat(this.repository.findByEmailDomain("@corp.com")).hasSize(4);
 	}
 
 	@Test
 	@DisplayName("constraint do banco real: email duplicado viola o unique da migracao")
 	void uniqueConstraintIsEnforcedByRealDatabase() {
-		assertThatThrownBy(() -> repository.saveAndFlush(
+		assertThatThrownBy(() -> this.repository.saveAndFlush(
 				new Employee("Clone", "alice@corp.com", "IT", BigDecimal.TEN, LocalDate.now())))
 				.isInstanceOf(DataIntegrityViolationException.class);
 	}

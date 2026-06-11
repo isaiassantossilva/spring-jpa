@@ -21,14 +21,14 @@ class ProjectionsTest {
 
 	@BeforeEach
 	void seed() {
-		repository.save(new Employee("Alice", "alice@corp.com", "IT", new BigDecimal("9000.00"), LocalDate.of(2020, 1, 15)));
-		repository.save(new Employee("Bob", "bob@corp.com", "IT", new BigDecimal("5000.00"), LocalDate.of(2021, 3, 10)));
+		this.repository.save(new Employee("Alice", "alice@corp.com", "IT", new BigDecimal("9000.00"), LocalDate.of(2020, 1, 15)));
+		this.repository.save(new Employee("Bob", "bob@corp.com", "IT", new BigDecimal("5000.00"), LocalDate.of(2021, 3, 10)));
 	}
 
 	@Test
 	@DisplayName("projecao por interface: closed (getName) e open com SpEL (getLabel)")
 	void interfaceProjection() {
-		List<EmployeeNameOnly> result = repository.findByDepartmentOrderByName("IT");
+		List<EmployeeNameOnly> result = this.repository.findByDepartmentOrderByName("IT");
 
 		assertThat(result).extracting(EmployeeNameOnly::getName).containsExactly("Alice", "Bob");
 		assertThat(result.getFirst().getLabel()).isEqualTo("Alice (IT)");
@@ -37,7 +37,7 @@ class ProjectionsTest {
 	@Test
 	@DisplayName("projecao DTO com record via constructor expression")
 	void recordProjection() {
-		List<EmployeeSummary> result = repository.findSummariesByDepartment("IT");
+		List<EmployeeSummary> result = this.repository.findSummariesByDepartment("IT");
 
 		assertThat(result)
 				.containsExactlyInAnyOrder(
@@ -48,8 +48,8 @@ class ProjectionsTest {
 	@Test
 	@DisplayName("projecao dinamica: o chamador escolhe o tipo de retorno")
 	void dynamicProjection() {
-		List<EmployeeNameOnly> names = repository.findByActiveTrue(EmployeeNameOnly.class);
-		List<Employee> entities = repository.findByActiveTrue(Employee.class);
+		List<EmployeeNameOnly> names = this.repository.findByActiveTrue(EmployeeNameOnly.class);
+		List<Employee> entities = this.repository.findByActiveTrue(Employee.class);
 
 		assertThat(names).hasSize(2).extracting(EmployeeNameOnly::getName).contains("Alice", "Bob");
 		assertThat(entities).hasSize(2).allSatisfy(e -> assertThat(e.getId()).isNotNull());

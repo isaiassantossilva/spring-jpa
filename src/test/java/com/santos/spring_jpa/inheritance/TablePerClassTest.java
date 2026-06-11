@@ -27,12 +27,12 @@ class TablePerClassTest {
 	@Test
 	@DisplayName("consulta polimorfica junta as tabelas das subclasses (UNION ALL)")
 	void polymorphicQueryAcrossTables() {
-		repository.save(new Circle("red", 2.0));
-		repository.save(new Square("blue", 3.0));
-		em.flush();
-		em.clear();
+		this.repository.save(new Circle("red", 2.0));
+		this.repository.save(new Square("blue", 3.0));
+		this.em.flush();
+		this.em.clear();
 
-		List<Shape> all = repository.findAll();
+		List<Shape> all = this.repository.findAll();
 
 		assertThat(all).hasSize(2);
 		assertThat(all).hasAtLeastOneElementOfType(Circle.class);
@@ -44,14 +44,14 @@ class TablePerClassTest {
 	@Test
 	@DisplayName("a classe abstrata nao tem tabela; cada concreta tem a sua")
 	void abstractClassHasNoTable() {
-		repository.save(new Circle("green", 1.0));
-		em.flush();
+		this.repository.save(new Circle("green", 1.0));
+		this.em.flush();
 
-		Number shapeTables = (Number) em.getEntityManager()
+		Number shapeTables = (Number) this.em.getEntityManager()
 				.createNativeQuery("select count(*) from information_schema.tables "
 						+ "where table_name = 'SHAPE' or table_name = 'SHAPES'")
 				.getSingleResult();
-		Number circles = (Number) em.getEntityManager()
+		Number circles = (Number) this.em.getEntityManager()
 				.createNativeQuery("select count(*) from circles")
 				.getSingleResult();
 

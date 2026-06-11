@@ -21,17 +21,17 @@ class SecondaryTableTest {
 	@Test
 	@DisplayName("o insert grava nas duas tabelas e o load junta de volta")
 	void splitsAcrossTwoTables() {
-		Long id = repository.saveAndFlush(
+		Long id = this.repository.saveAndFlush(
 				new BlogPost("JPA na pratica", "Conteudo longo...", "jpa-na-pratica")).getId();
-		em.clear();
+		this.em.clear();
 
-		BlogPost reloaded = repository.findById(id).orElseThrow();
+		BlogPost reloaded = this.repository.findById(id).orElseThrow();
 		assertThat(reloaded.getTitle()).isEqualTo("JPA na pratica");
 		assertThat(reloaded.getContent()).isEqualTo("Conteudo longo...");
 
-		Number mainRows = (Number) em.getEntityManager()
+		Number mainRows = (Number) this.em.getEntityManager()
 				.createNativeQuery("select count(*) from blog_posts").getSingleResult();
-		Number detailRows = (Number) em.getEntityManager()
+		Number detailRows = (Number) this.em.getEntityManager()
 				.createNativeQuery("select count(*) from blog_post_details").getSingleResult();
 		assertThat(mainRows.intValue()).isEqualTo(1);
 		assertThat(detailRows.intValue()).isEqualTo(1);
@@ -40,10 +40,10 @@ class SecondaryTableTest {
 	@Test
 	@DisplayName("query method filtra por coluna da tabela secundaria")
 	void queriesSecondaryTableColumn() {
-		repository.save(new BlogPost("Post A", "...", "seo-aaa"));
-		repository.save(new BlogPost("Post B", "...", "seo-bbb"));
+		this.repository.save(new BlogPost("Post A", "...", "seo-aaa"));
+		this.repository.save(new BlogPost("Post B", "...", "seo-bbb"));
 
-		assertThat(repository.findBySeoTitleContaining("bbb"))
+		assertThat(this.repository.findBySeoTitleContaining("bbb"))
 				.singleElement()
 				.extracting(BlogPost::getTitle).isEqualTo("Post B");
 	}

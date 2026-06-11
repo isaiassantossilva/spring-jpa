@@ -44,12 +44,12 @@ public class Author {
 
 	/** Helpers que mantem os dois lados do relacionamento sincronizados. */
 	public void addBook(Book book) {
-		books.add(book);
+		this.books.add(book);
 		book.setAuthor(this);
 	}
 
 	public void removeBook(Book book) {
-		books.remove(book);
+		this.books.remove(book);
 		book.setAuthor(null);
 	}
 }

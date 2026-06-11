@@ -25,32 +25,32 @@ class JpqlAndNativeQueryTest {
 
 	@BeforeEach
 	void seed() {
-		repository.save(new Employee("Alice", "alice@corp.com", "IT", new BigDecimal("9000.00"), LocalDate.of(2020, 1, 15)));
-		repository.save(new Employee("Bob", "bob@corp.com", "IT", new BigDecimal("5000.00"), LocalDate.of(2021, 3, 10)));
+		this.repository.save(new Employee("Alice", "alice@corp.com", "IT", new BigDecimal("9000.00"), LocalDate.of(2020, 1, 15)));
+		this.repository.save(new Employee("Bob", "bob@corp.com", "IT", new BigDecimal("5000.00"), LocalDate.of(2021, 3, 10)));
 		Employee dave = new Employee("Dave", "dave@oldcorp.com", "HR", new BigDecimal("4000.00"), LocalDate.of(2022, 11, 5));
 		dave.setActive(false);
-		repository.save(dave);
-		em.flush();
+		this.repository.save(dave);
+		this.em.flush();
 	}
 
 	@Test
 	@DisplayName("JPQL com parametro nomeado (:min)")
 	void jpqlNamedParameter() {
-		assertThat(repository.findWellPaidActive(new BigDecimal("6000")))
+		assertThat(this.repository.findWellPaidActive(new BigDecimal("6000")))
 				.extracting(Employee::getName).containsExactly("Alice");
 	}
 
 	@Test
 	@DisplayName("JPQL com parametro posicional (?1)")
 	void jpqlPositionalParameter() {
-		assertThat(repository.findByDepartmentSorted("IT"))
+		assertThat(this.repository.findByDepartmentSorted("IT"))
 				.extracting(Employee::getName).containsExactly("Alice", "Bob");
 	}
 
 	@Test
 	@DisplayName("funcao de agregacao (avg)")
 	void aggregateFunction() {
-		assertThat(repository.averageSalaryByDepartment("IT"))
+		assertThat(this.repository.averageSalaryByDepartment("IT"))
 				.isPresent()
 				.get().satisfies(avg -> assertThat(avg).isCloseTo(7000.0, within(0.01)));
 	}
@@ -58,7 +58,7 @@ class JpqlAndNativeQueryTest {
 	@Test
 	@DisplayName("constructor expression projeta direto para DTO")
 	void constructorExpression() {
-		assertThat(repository.findSummariesByDepartment("IT"))
+		assertThat(this.repository.findSummariesByDepartment("IT"))
 				.extracting(EmployeeSummary::name)
 				.containsExactlyInAnyOrder("Alice", "Bob");
 	}
@@ -66,28 +66,28 @@ class JpqlAndNativeQueryTest {
 	@Test
 	@DisplayName("query nativa com SQL puro")
 	void nativeQuery() {
-		assertThat(repository.findByEmailDomain("@oldcorp.com"))
+		assertThat(this.repository.findByEmailDomain("@oldcorp.com"))
 				.extracting(Employee::getName).containsExactly("Dave");
 	}
 
 	@Test
 	@DisplayName("@Modifying executa bulk update direto no banco")
 	void modifyingBulkUpdate() {
-		int affected = repository.raiseSalaryByDepartment("IT", new BigDecimal("1.10"));
+		int affected = this.repository.raiseSalaryByDepartment("IT", new BigDecimal("1.10"));
 
 		assertThat(affected).isEqualTo(2);
 		// clearAutomatically = true descartou o contexto: a leitura vem do banco
-		assertThat(repository.findByEmail("bob@corp.com").orElseThrow().getSalary())
+		assertThat(this.repository.findByEmail("bob@corp.com").orElseThrow().getSalary())
 				.isEqualByComparingTo("5500.00");
 	}
 
 	@Test
 	@DisplayName("@Modifying executa bulk delete")
 	void modifyingBulkDelete() {
-		int removed = repository.purgeInactive();
-		em.clear();
+		int removed = this.repository.purgeInactive();
+		this.em.clear();
 
 		assertThat(removed).isEqualTo(1);
-		assertThat(repository.count()).isEqualTo(2);
+		assertThat(this.repository.count()).isEqualTo(2);
 	}
 }

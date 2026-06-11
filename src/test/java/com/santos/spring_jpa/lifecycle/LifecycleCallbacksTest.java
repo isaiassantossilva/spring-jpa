@@ -21,7 +21,7 @@ class LifecycleCallbacksTest {
 	@Test
 	@DisplayName("@PrePersist/@PostPersist disparam no insert (slug gerado)")
 	void persistCallbacks() {
-		Document doc = repository.saveAndFlush(new Document("Meu Primeiro Post"));
+		Document doc = this.repository.saveAndFlush(new Document("Meu Primeiro Post"));
 
 		assertThat(doc.getSlug()).isEqualTo("meu-primeiro-post");
 		assertThat(doc.getFiredCallbacks()).containsExactly("PrePersist", "PostPersist");
@@ -30,21 +30,21 @@ class LifecycleCallbacksTest {
 	@Test
 	@DisplayName("@PostLoad dispara ao carregar do banco")
 	void loadCallback() {
-		Long id = repository.saveAndFlush(new Document("Carregado")).getId();
-		em.clear();
+		Long id = this.repository.saveAndFlush(new Document("Carregado")).getId();
+		this.em.clear();
 
-		Document reloaded = repository.findById(id).orElseThrow();
+		Document reloaded = this.repository.findById(id).orElseThrow();
 		assertThat(reloaded.getFiredCallbacks()).containsExactly("PostLoad");
 	}
 
 	@Test
 	@DisplayName("@PreUpdate dispara no update (lastModified preenchido)")
 	void updateCallback() {
-		Document doc = repository.saveAndFlush(new Document("Vai Mudar"));
+		Document doc = this.repository.saveAndFlush(new Document("Vai Mudar"));
 		assertThat(doc.getLastModified()).isNull();
 
 		doc.setTitle("Mudou");
-		em.flush();
+		this.em.flush();
 
 		assertThat(doc.getLastModified()).isNotNull();
 		assertThat(doc.getFiredCallbacks()).contains("PreUpdate");
@@ -53,12 +53,12 @@ class LifecycleCallbacksTest {
 	@Test
 	@DisplayName("@PreRemove dispara antes do delete")
 	void removeCallback() {
-		Document doc = repository.saveAndFlush(new Document("Efemero"));
+		Document doc = this.repository.saveAndFlush(new Document("Efemero"));
 
-		repository.delete(doc);
-		em.flush();
+		this.repository.delete(doc);
+		this.em.flush();
 
 		assertThat(doc.getFiredCallbacks()).contains("PreRemove");
-		assertThat(repository.count()).isZero();
+		assertThat(this.repository.count()).isZero();
 	}
 }

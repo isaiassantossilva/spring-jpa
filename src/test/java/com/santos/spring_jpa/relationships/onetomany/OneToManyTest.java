@@ -26,8 +26,8 @@ class OneToManyTest {
 		Author author = new Author(name);
 		author.addBook(new Book("Livro 1 de " + name));
 		author.addBook(new Book("Livro 2 de " + name));
-		Author saved = authorRepository.saveAndFlush(author);
-		em.clear();
+		Author saved = this.authorRepository.saveAndFlush(author);
+		this.em.clear();
 		return saved;
 	}
 
@@ -36,8 +36,8 @@ class OneToManyTest {
 	void cascadePersist() {
 		Author saved = persistAuthorWithTwoBooks("Machado");
 
-		assertThat(bookRepository.findByAuthorName("Machado")).hasSize(2);
-		assertThat(bookRepository.findAll())
+		assertThat(this.bookRepository.findByAuthorName("Machado")).hasSize(2);
+		assertThat(this.bookRepository.findAll())
 				.allSatisfy(book -> assertThat(book.getAuthor().getId()).isEqualTo(saved.getId()));
 	}
 
@@ -46,7 +46,7 @@ class OneToManyTest {
 	void lazyLoading() {
 		Long id = persistAuthorWithTwoBooks("Clarice").getId();
 
-		Author reloaded = authorRepository.findById(id).orElseThrow();
+		Author reloaded = this.authorRepository.findById(id).orElseThrow();
 		assertThat(Hibernate.isInitialized(reloaded.getBooks())).isFalse();
 
 		// acessar a colecao dentro da transacao dispara o SELECT
@@ -59,17 +59,17 @@ class OneToManyTest {
 	void fetchStrategies() {
 		persistAuthorWithTwoBooks("Guimaraes");
 
-		Author fetched = authorRepository.findWithBooksByName("Guimaraes").orElseThrow();
+		Author fetched = this.authorRepository.findWithBooksByName("Guimaraes").orElseThrow();
 		assertThat(Hibernate.isInitialized(fetched.getBooks())).isTrue();
-		em.clear();
+		this.em.clear();
 
-		assertThat(authorRepository.findWithBooksByNameContaining("Guima"))
+		assertThat(this.authorRepository.findWithBooksByNameContaining("Guima"))
 				.singleElement()
 				.satisfies(a -> assertThat(Hibernate.isInitialized(a.getBooks())).isTrue());
-		em.clear();
+		this.em.clear();
 
 		// @NamedEntityGraph definido na entidade, referenciado pelo nome
-		Author viaGraph = authorRepository.findOneWithGraphByName("Guimaraes").orElseThrow();
+		Author viaGraph = this.authorRepository.findOneWithGraphByName("Guimaraes").orElseThrow();
 		assertThat(Hibernate.isInitialized(viaGraph.getBooks())).isTrue();
 	}
 
@@ -78,11 +78,11 @@ class OneToManyTest {
 	void orphanRemoval() {
 		Long id = persistAuthorWithTwoBooks("Jorge").getId();
 
-		Author author = authorRepository.findById(id).orElseThrow();
+		Author author = this.authorRepository.findById(id).orElseThrow();
 		author.removeBook(author.getBooks().getFirst());
-		em.flush();
+		this.em.flush();
 
-		assertThat(bookRepository.count()).isEqualTo(1);
+		assertThat(this.bookRepository.count()).isEqualTo(1);
 	}
 
 	@Test
@@ -90,9 +90,9 @@ class OneToManyTest {
 	void cascadeRemove() {
 		Long id = persistAuthorWithTwoBooks("Cecilia").getId();
 
-		authorRepository.deleteById(id);
-		em.flush();
+		this.authorRepository.deleteById(id);
+		this.em.flush();
 
-		assertThat(bookRepository.count()).isZero();
+		assertThat(this.bookRepository.count()).isZero();
 	}
 }

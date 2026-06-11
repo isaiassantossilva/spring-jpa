@@ -49,28 +49,28 @@ public class Document {
 
 	@PrePersist
 	void onPrePersist() {
-		slug = title.toLowerCase().replace(' ', '-');
-		firedCallbacks.add("PrePersist");
+		this.slug = this.title.toLowerCase().replace(' ', '-');
+		this.firedCallbacks.add("PrePersist");
 	}
 
 	@PostPersist
 	void onPostPersist() {
-		firedCallbacks.add("PostPersist");
+		this.firedCallbacks.add("PostPersist");
 	}
 
 	@PreUpdate
 	void onPreUpdate() {
-		lastModified = Instant.now();
-		firedCallbacks.add("PreUpdate");
+		this.lastModified = Instant.now();
+		this.firedCallbacks.add("PreUpdate");
 	}
 
 	@PreRemove
 	void onPreRemove() {
-		firedCallbacks.add("PreRemove");
+		this.firedCallbacks.add("PreRemove");
 	}
 
 	@PostLoad
 	void onPostLoad() {
-		firedCallbacks.add("PostLoad");
+		this.firedCallbacks.add("PostLoad");
 	}
 }

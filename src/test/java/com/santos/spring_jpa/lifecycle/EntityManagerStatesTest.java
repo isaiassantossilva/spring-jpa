@@ -22,7 +22,7 @@ class EntityManagerStatesTest {
 	@Test
 	@DisplayName("persist torna a entidade managed; mudancas vao via dirty checking")
 	void persistAndDirtyChecking() {
-		EntityManager em = tem.getEntityManager();
+		EntityManager em = this.tem.getEntityManager();
 		Document doc = new Document("Rascunho");
 
 		assertThat(em.contains(doc)).isFalse(); // transient
@@ -32,33 +32,33 @@ class EntityManagerStatesTest {
 		assertThat(doc.getId()).isNotNull();
 
 		doc.setTitle("Rascunho v2"); // sem save: dirty checking
-		tem.flush();
-		tem.clear();
+		this.tem.flush();
+		this.tem.clear();
 
-		assertThat(tem.find(Document.class, doc.getId()).getTitle()).isEqualTo("Rascunho v2");
+		assertThat(this.tem.find(Document.class, doc.getId()).getTitle()).isEqualTo("Rascunho v2");
 	}
 
 	@Test
 	@DisplayName("detach desconecta a entidade; mudancas nela sao ignoradas")
 	void detachIgnoresChanges() {
-		EntityManager em = tem.getEntityManager();
-		Document doc = tem.persistFlushFind(new Document("Original"));
+		EntityManager em = this.tem.getEntityManager();
+		Document doc = this.tem.persistFlushFind(new Document("Original"));
 
 		em.detach(doc);
 		assertThat(em.contains(doc)).isFalse();
 
 		doc.setTitle("Mudanca perdida");
-		tem.flush();
-		tem.clear();
+		this.tem.flush();
+		this.tem.clear();
 
-		assertThat(tem.find(Document.class, doc.getId()).getTitle()).isEqualTo("Original");
+		assertThat(this.tem.find(Document.class, doc.getId()).getTitle()).isEqualTo("Original");
 	}
 
 	@Test
 	@DisplayName("merge copia o estado da detached para uma instancia managed")
 	void mergeReattaches() {
-		EntityManager em = tem.getEntityManager();
-		Document doc = tem.persistFlushFind(new Document("Antes"));
+		EntityManager em = this.tem.getEntityManager();
+		Document doc = this.tem.persistFlushFind(new Document("Antes"));
 		em.detach(doc);
 
 		doc.setTitle("Depois");
@@ -66,31 +66,31 @@ class EntityManagerStatesTest {
 
 		assertThat(merged).isNotSameAs(doc); // merge retorna outra instancia
 		assertThat(em.contains(merged)).isTrue();
-		tem.flush();
-		tem.clear();
+		this.tem.flush();
+		this.tem.clear();
 
-		assertThat(tem.find(Document.class, doc.getId()).getTitle()).isEqualTo("Depois");
+		assertThat(this.tem.find(Document.class, doc.getId()).getTitle()).isEqualTo("Depois");
 	}
 
 	@Test
 	@DisplayName("remove marca a entidade para delecao no flush")
 	void removeDeletes() {
-		EntityManager em = tem.getEntityManager();
-		Document doc = tem.persistFlushFind(new Document("Descartavel"));
+		EntityManager em = this.tem.getEntityManager();
+		Document doc = this.tem.persistFlushFind(new Document("Descartavel"));
 
 		em.remove(doc);
 		assertThat(em.contains(doc)).isFalse();
-		tem.flush();
+		this.tem.flush();
 
-		assertThat(tem.find(Document.class, doc.getId())).isNull();
+		assertThat(this.tem.find(Document.class, doc.getId())).isNull();
 	}
 
 	@Test
 	@DisplayName("getReference retorna proxy lazy sem consultar o banco")
 	void getReferenceReturnsProxy() {
-		EntityManager em = tem.getEntityManager();
-		Long id = tem.persistAndFlush(new Document("Proxy")).getId();
-		tem.clear();
+		EntityManager em = this.tem.getEntityManager();
+		Long id = this.tem.persistAndFlush(new Document("Proxy")).getId();
+		this.tem.clear();
 
 		Document reference = em.getReference(Document.class, id);
 

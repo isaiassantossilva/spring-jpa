@@ -23,11 +23,11 @@ class AttributeConverterTest {
 	@Test
 	@DisplayName("ida e volta: o atributo e reconstruido pelo converter")
 	void roundTrip() {
-		Long id = repository.saveAndFlush(
+		Long id = this.repository.saveAndFlush(
 				new Subscription("zah", SubscriptionTier.PRO, List.of("api", "reports"))).getId();
-		em.clear();
+		this.em.clear();
 
-		Subscription reloaded = repository.findById(id).orElseThrow();
+		Subscription reloaded = this.repository.findById(id).orElseThrow();
 
 		assertThat(reloaded.getTier()).isEqualTo(SubscriptionTier.PRO);
 		assertThat(reloaded.getFeatures()).containsExactly("api", "reports");
@@ -36,10 +36,10 @@ class AttributeConverterTest {
 	@Test
 	@DisplayName("no banco fica o valor convertido ('P' e CSV), nao a representacao Java")
 	void databaseStoresConvertedValues() {
-		Long id = repository.saveAndFlush(
+		Long id = this.repository.saveAndFlush(
 				new Subscription("acme", SubscriptionTier.ENTERPRISE, List.of("sso", "audit"))).getId();
 
-		Object[] row = (Object[]) em.getEntityManager()
+		Object[] row = (Object[]) this.em.getEntityManager()
 				.createNativeQuery("select tier, features from subscriptions where id = :id")
 				.setParameter("id", id)
 				.getSingleResult();
@@ -51,10 +51,10 @@ class AttributeConverterTest {
 	@Test
 	@DisplayName("parametros de query method tambem passam pelo converter")
 	void queryParameterIsConverted() {
-		repository.save(new Subscription("a", SubscriptionTier.FREE, List.of()));
-		repository.save(new Subscription("b", SubscriptionTier.PRO, List.of("api")));
+		this.repository.save(new Subscription("a", SubscriptionTier.FREE, List.of()));
+		this.repository.save(new Subscription("b", SubscriptionTier.PRO, List.of("api")));
 
-		assertThat(repository.findByTier(SubscriptionTier.PRO))
+		assertThat(this.repository.findByTier(SubscriptionTier.PRO))
 				.singleElement()
 				.extracting(Subscription::getCustomer).isEqualTo("b");
 	}
@@ -62,10 +62,10 @@ class AttributeConverterTest {
 	@Test
 	@DisplayName("lista vazia vira null no banco e volta como lista vazia")
 	void emptyListHandling() {
-		Long id = repository.saveAndFlush(
+		Long id = this.repository.saveAndFlush(
 				new Subscription("vazio", SubscriptionTier.FREE, List.of())).getId();
-		em.clear();
+		this.em.clear();
 
-		assertThat(repository.findById(id).orElseThrow().getFeatures()).isEmpty();
+		assertThat(this.repository.findById(id).orElseThrow().getFeatures()).isEmpty();
 	}
 }

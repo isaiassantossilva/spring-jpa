@@ -21,7 +21,7 @@ class EmbeddedMappingTest {
 	@Test
 	@DisplayName("embeddable e persistido nas colunas da tabela da entidade dona")
 	void persistsEmbeddedValues() {
-		Customer saved = em.persistFlushFind(new Customer("Joana",
+		Customer saved = this.em.persistFlushFind(new Customer("Joana",
 				new Address("Rua A, 10", "Sao Paulo", "01000-000"),
 				new Address("Av. B, 99", "Campinas", "13000-000")));
 
@@ -32,14 +32,14 @@ class EmbeddedMappingTest {
 	@Test
 	@DisplayName("query method navega na propriedade do embeddable (findByHomeAddressCity)")
 	void queriesByEmbeddedProperty() {
-		repository.save(new Customer("Joana",
+		this.repository.save(new Customer("Joana",
 				new Address("Rua A", "Sao Paulo", "01000-000"),
 				new Address("Av. B", "Campinas", "13000-000")));
-		repository.save(new Customer("Pedro",
+		this.repository.save(new Customer("Pedro",
 				new Address("Rua C", "Recife", "50000-000"),
 				new Address("Rua C", "Recife", "50000-000")));
 
-		assertThat(repository.findByHomeAddressCity("Recife"))
+		assertThat(this.repository.findByHomeAddressCity("Recife"))
 				.singleElement()
 				.extracting(Customer::getName).isEqualTo("Pedro");
 	}

@@ -19,34 +19,34 @@ public class LedgerService {
 
 	@Transactional
 	public LedgerEntry record(String description) {
-		return repository.save(new LedgerEntry(description));
+		return this.repository.save(new LedgerEntry(description));
 	}
 
 	/** RuntimeException faz rollback por padrao: o save abaixo e desfeito. */
 	@Transactional
 	public void recordAndFail(String description) {
-		repository.save(new LedgerEntry(description));
+		this.repository.save(new LedgerEntry(description));
 		throw new IllegalStateException("falha apos gravar");
 	}
 
 	/** Excecao CHECKED nao faz rollback por padrao: o save e commitado! */
 	@Transactional
 	public void recordAndFailChecked(String description) throws Exception {
-		repository.save(new LedgerEntry(description));
+		this.repository.save(new LedgerEntry(description));
 		throw new Exception("checked nao dispara rollback por padrao");
 	}
 
 	/** rollbackFor estende o rollback as checked. */
 	@Transactional(rollbackFor = Exception.class)
 	public void recordAndFailCheckedWithRollback(String description) throws Exception {
-		repository.save(new LedgerEntry(description));
+		this.repository.save(new LedgerEntry(description));
 		throw new Exception("com rollbackFor, agora desfaz");
 	}
 
 	/** noRollbackFor: a excecao listada NAO derruba a transacao. */
 	@Transactional(noRollbackFor = IllegalStateException.class)
 	public void recordAndFailWithoutRollback(String description) {
-		repository.save(new LedgerEntry(description));
+		this.repository.save(new LedgerEntry(description));
 		throw new IllegalStateException("lancada, mas o save commita");
 	}
 
@@ -56,8 +56,8 @@ public class LedgerService {
 	 */
 	@Transactional
 	public void recordWithAuditThenFail(String description) {
-		auditTrailService.logAttempt(description);
-		repository.save(new LedgerEntry(description));
+		this.auditTrailService.logAttempt(description);
+		this.repository.save(new LedgerEntry(description));
 		throw new IllegalStateException("rollback so da transacao principal");
 	}
 
@@ -68,9 +68,9 @@ public class LedgerService {
 	 */
 	@Transactional
 	public void outerCatchesInnerFailure(String description) {
-		repository.save(new LedgerEntry(description));
+		this.repository.save(new LedgerEntry(description));
 		try {
-			auditTrailService.failInCurrentTransaction();
+			this.auditTrailService.failInCurrentTransaction();
 		} catch (IllegalStateException ignored) {
 			// engolida — mas a transacao compartilhada ja esta condenada
 		}
@@ -82,7 +82,7 @@ public class LedgerService {
 	 */
 	@Transactional(readOnly = true)
 	public void tryToRenameInReadOnly(Long id, String newDescription) {
-		repository.findById(id).orElseThrow().setDescription(newDescription);
+		this.repository.findById(id).orElseThrow().setDescription(newDescription);
 	}
 
 	/**
@@ -93,12 +93,12 @@ public class LedgerService {
 	@Transactional
 	public void selfInvocationPitfall(String description) {
 		this.auditViaSelf("audit: " + description);
-		repository.save(new LedgerEntry(description));
+		this.repository.save(new LedgerEntry(description));
 		throw new IllegalStateException("derruba tudo, inclusive a auditoria");
 	}
 
 	@Transactional(propagation = Propagation.REQUIRES_NEW)
 	public void auditViaSelf(String message) {
-		repository.save(new LedgerEntry(message));
+		this.repository.save(new LedgerEntry(message));
 	}
 }

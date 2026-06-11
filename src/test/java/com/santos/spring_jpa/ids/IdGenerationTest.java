@@ -29,8 +29,8 @@ class IdGenerationTest {
 	@Test
 	@DisplayName("SEQUENCE: ids vem da sequence customizada (initialValue = 1000)")
 	void sequenceGeneration() {
-		Invoice first = invoiceRepository.save(new Invoice(new BigDecimal("100.00")));
-		Invoice second = invoiceRepository.save(new Invoice(new BigDecimal("200.00")));
+		Invoice first = this.invoiceRepository.save(new Invoice(new BigDecimal("100.00")));
+		Invoice second = this.invoiceRepository.save(new Invoice(new BigDecimal("200.00")));
 
 		assertThat(first.getId()).isGreaterThanOrEqualTo(1000L);
 		assertThat(second.getId()).isGreaterThan(first.getId());
@@ -39,30 +39,30 @@ class IdGenerationTest {
 	@Test
 	@DisplayName("UUID: id gerado automaticamente como UUID")
 	void uuidGeneration() {
-		Ticket ticket = ticketRepository.save(new Ticket("Sistema fora do ar"));
+		Ticket ticket = this.ticketRepository.save(new Ticket("Sistema fora do ar"));
 
 		assertThat(ticket.getId()).isNotNull().isInstanceOf(UUID.class);
-		assertThat(ticketRepository.findById(ticket.getId())).isPresent();
+		assertThat(this.ticketRepository.findById(ticket.getId())).isPresent();
 	}
 
 	@Test
 	@DisplayName("@EmbeddedId: busca usando a chave composta")
 	void embeddedIdCompositeKey() {
 		EnrollmentId id = new EnrollmentId(1L, 42L);
-		enrollmentRepository.save(new Enrollment(id, 9.5));
+		this.enrollmentRepository.save(new Enrollment(id, 9.5));
 
-		Enrollment found = enrollmentRepository.findById(new EnrollmentId(1L, 42L)).orElseThrow();
+		Enrollment found = this.enrollmentRepository.findById(new EnrollmentId(1L, 42L)).orElseThrow();
 		assertThat(found.getGrade()).isEqualTo(9.5);
 	}
 
 	@Test
 	@DisplayName("@IdClass: dois campos @Id formam a chave")
 	void idClassCompositeKey() {
-		countryLanguageRepository.save(new CountryLanguage("BR", "pt", true));
-		countryLanguageRepository.save(new CountryLanguage("BR", "es", false));
+		this.countryLanguageRepository.save(new CountryLanguage("BR", "pt", true));
+		this.countryLanguageRepository.save(new CountryLanguage("BR", "es", false));
 
-		assertThat(countryLanguageRepository.findByCountry("BR")).hasSize(2);
-		assertThat(countryLanguageRepository.findById(new CountryLanguageId("BR", "pt")))
+		assertThat(this.countryLanguageRepository.findByCountry("BR")).hasSize(2);
+		assertThat(this.countryLanguageRepository.findById(new CountryLanguageId("BR", "pt")))
 				.isPresent()
 				.get().extracting(CountryLanguage::isOfficial).isEqualTo(true);
 	}

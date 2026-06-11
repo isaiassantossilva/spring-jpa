@@ -34,21 +34,21 @@ class HibernateFeaturesTest {
 	@Test
 	@DisplayName("@Formula calcula o atributo no SELECT (read-only)")
 	void formulaIsComputedOnLoad() {
-		Long id = movieRepository.saveAndFlush(
+		Long id = this.movieRepository.saveAndFlush(
 				new Movie("Matrix", "tt0133093", new BigDecimal("50.00"))).getId();
-		tem.clear();
+		this.tem.clear();
 
-		Movie reloaded = movieRepository.findById(id).orElseThrow();
+		Movie reloaded = this.movieRepository.findById(id).orElseThrow();
 		assertThat(reloaded.getPriceWithTax()).isEqualByComparingTo("60.00");
 	}
 
 	@Test
 	@DisplayName("@NaturalId: lookup pela chave de negocio via Session")
 	void naturalIdLookup() {
-		movieRepository.saveAndFlush(new Movie("Matrix", "tt0133093", new BigDecimal("50.00")));
-		tem.clear();
+		this.movieRepository.saveAndFlush(new Movie("Matrix", "tt0133093", new BigDecimal("50.00")));
+		this.tem.clear();
 
-		Movie movie = em.unwrap(Session.class)
+		Movie movie = this.em.unwrap(Session.class)
 				.bySimpleNaturalId(Movie.class)
 				.load("tt0133093");
 
@@ -58,17 +58,17 @@ class HibernateFeaturesTest {
 	@Test
 	@DisplayName("@Filter: restricao parametrizada ativada por sessao")
 	void filterRestrictsQueriesWhenEnabled() {
-		movieRepository.save(new Movie("Barato", "tt0000001", new BigDecimal("10.00")));
-		movieRepository.save(new Movie("Caro", "tt0000002", new BigDecimal("80.00")));
-		tem.flush();
+		this.movieRepository.save(new Movie("Barato", "tt0000001", new BigDecimal("10.00")));
+		this.movieRepository.save(new Movie("Caro", "tt0000002", new BigDecimal("80.00")));
+		this.tem.flush();
 
-		assertThat(movieRepository.findAll()).hasSize(2);
+		assertThat(this.movieRepository.findAll()).hasSize(2);
 
-		em.unwrap(Session.class)
+		this.em.unwrap(Session.class)
 				.enableFilter("minPrice")
 				.setParameter("min", new BigDecimal("50.00"));
 
-		assertThat(movieRepository.findAll())
+		assertThat(this.movieRepository.findAll())
 				.singleElement()
 				.extracting(Movie::getTitle).isEqualTo("Caro");
 	}
@@ -76,16 +76,16 @@ class HibernateFeaturesTest {
 	@Test
 	@DisplayName("@SQLRestriction esconde linhas que nao atendem ao WHERE fixo")
 	void sqlRestrictionHidesRows() {
-		couponRepository.save(new Coupon("ATIVO10"));
-		tem.flush();
+		this.couponRepository.save(new Coupon("ATIVO10"));
+		this.tem.flush();
 
 		// insere um cupom expirado por baixo dos panos (SQL nativo)
-		em.createNativeQuery("insert into coupons (code, expired) values ('VELHO99', true)")
+		this.em.createNativeQuery("insert into coupons (code, expired) values ('VELHO99', true)")
 				.executeUpdate();
 
-		Number totalRows = (Number) em.createNativeQuery("select count(*) from coupons").getSingleResult();
+		Number totalRows = (Number) this.em.createNativeQuery("select count(*) from coupons").getSingleResult();
 		assertThat(totalRows.intValue()).isEqualTo(2);
-		assertThat(couponRepository.findAll())
+		assertThat(this.couponRepository.findAll())
 				.singleElement()
 				.extracting(Coupon::getCode).isEqualTo("ATIVO10");
 	}
@@ -93,16 +93,16 @@ class HibernateFeaturesTest {
 	@Test
 	@DisplayName("@SoftDelete: delete vira UPDATE e a linha some das leituras JPA")
 	void softDeleteKeepsRowInDatabase() {
-		SoftNote note = softNoteRepository.saveAndFlush(new SoftNote("nao me apague de verdade"));
+		SoftNote note = this.softNoteRepository.saveAndFlush(new SoftNote("nao me apague de verdade"));
 
-		softNoteRepository.delete(note);
-		tem.flush();
-		tem.clear();
+		this.softNoteRepository.delete(note);
+		this.tem.flush();
+		this.tem.clear();
 
-		assertThat(softNoteRepository.findAll()).isEmpty();
+		assertThat(this.softNoteRepository.findAll()).isEmpty();
 
-		Number rawRows = (Number) em.createNativeQuery("select count(*) from soft_notes").getSingleResult();
-		Number deletedFlag = (Number) em.createNativeQuery(
+		Number rawRows = (Number) this.em.createNativeQuery("select count(*) from soft_notes").getSingleResult();
+		Number deletedFlag = (Number) this.em.createNativeQuery(
 				"select count(*) from soft_notes where deleted = true").getSingleResult();
 		assertThat(rawRows.intValue()).isEqualTo(1);
 		assertThat(deletedFlag.intValue()).isEqualTo(1);

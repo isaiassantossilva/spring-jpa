@@ -39,7 +39,7 @@ class EmployeeApiIntegrationTest {
 	@Test
 	@DisplayName("POST cria no banco e o GET do Location devolve o recurso")
 	void createThenFetch() throws Exception {
-		String location = mvc.perform(post("/api/employees")
+		String location = this.mvc.perform(post("/api/employees")
 						.contentType(MediaType.APPLICATION_JSON)
 						.content("""
 								{"name": "Erin", "email": "erin@corp.com",
@@ -48,22 +48,22 @@ class EmployeeApiIntegrationTest {
 				.andExpect(status().isCreated())
 				.andReturn().getResponse().getHeader("Location");
 
-		mvc.perform(get(location))
+		this.mvc.perform(get(location))
 				.andExpect(status().isOk())
 				.andExpect(jsonPath("$.name").value("Erin"))
 				.andExpect(jsonPath("$.department").value("Sales"));
 
-		assertThat(repository.findByEmail("erin@corp.com")).isPresent();
+		assertThat(this.repository.findByEmail("erin@corp.com")).isPresent();
 	}
 
 	@Test
 	@DisplayName("paginacao via query params chega ao repositorio e volta como JSON")
 	void paginationEndToEnd() throws Exception {
-		repository.save(new Employee("Alice", "alice@corp.com", "IT", new BigDecimal("9000.00"), LocalDate.of(2020, 1, 15)));
-		repository.save(new Employee("Bob", "bob@corp.com", "IT", new BigDecimal("5000.00"), LocalDate.of(2021, 3, 10)));
-		repository.save(new Employee("Carol", "carol@corp.com", "HR", new BigDecimal("7000.00"), LocalDate.of(2019, 7, 1)));
+		this.repository.save(new Employee("Alice", "alice@corp.com", "IT", new BigDecimal("9000.00"), LocalDate.of(2020, 1, 15)));
+		this.repository.save(new Employee("Bob", "bob@corp.com", "IT", new BigDecimal("5000.00"), LocalDate.of(2021, 3, 10)));
+		this.repository.save(new Employee("Carol", "carol@corp.com", "HR", new BigDecimal("7000.00"), LocalDate.of(2019, 7, 1)));
 
-		mvc.perform(get("/api/employees")
+		this.mvc.perform(get("/api/employees")
 						.param("page", "0")
 						.param("size", "2")
 						.param("sort", "salary,desc"))

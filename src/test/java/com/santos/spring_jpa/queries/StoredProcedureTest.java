@@ -26,7 +26,7 @@ class StoredProcedureTest {
 
 	@BeforeEach
 	void registerAlias() {
-		em.createNativeQuery("create alias if not exists plus_tax for "
+		this.em.createNativeQuery("create alias if not exists plus_tax for "
 						+ "'com.santos.spring_jpa.procedures.H2Functions.plusTax'")
 				.executeUpdate();
 	}
@@ -34,7 +34,7 @@ class StoredProcedureTest {
 	@Test
 	@DisplayName("CALL invoca a funcao registrada no banco")
 	void callsProcedure() {
-		Double result = repository.plusTax(100.0);
+		Double result = this.repository.plusTax(100.0);
 
 		assertThat(result).isCloseTo(120.0, within(0.001));
 	}

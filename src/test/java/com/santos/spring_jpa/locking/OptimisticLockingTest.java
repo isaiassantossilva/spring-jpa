@@ -25,11 +25,11 @@ class OptimisticLockingTest {
 	@Test
 	@DisplayName("@Version inicia em 0 e incrementa a cada update")
 	void versionIncrements() {
-		Account account = repository.saveAndFlush(new Account("zah", new BigDecimal("100.00")));
+		Account account = this.repository.saveAndFlush(new Account("zah", new BigDecimal("100.00")));
 		assertThat(account.getVersion()).isZero();
 
 		account.setBalance(new BigDecimal("150.00"));
-		em.flush();
+		this.em.flush();
 
 		assertThat(account.getVersion()).isEqualTo(1);
 	}
@@ -37,20 +37,20 @@ class OptimisticLockingTest {
 	@Test
 	@DisplayName("salvar uma copia desatualizada (stale) lanca OptimisticLockingFailureException")
 	void staleUpdateFails() {
-		Account account = repository.saveAndFlush(new Account("zah", new BigDecimal("100.00")));
+		Account account = this.repository.saveAndFlush(new Account("zah", new BigDecimal("100.00")));
 		Long id = account.getId();
 
 		// outra "transacao" altera a conta: versao no banco vira 1
 		account.setBalance(new BigDecimal("200.00"));
-		em.flush();
-		em.clear();
+		this.em.flush();
+		this.em.clear();
 
 		// copia detached carregada antes da alteracao (versao 0)
 		Account stale = new Account("zah", new BigDecimal("50.00"));
 		stale.setId(id);
 		stale.setVersion(0L);
 
-		assertThatThrownBy(() -> repository.saveAndFlush(stale))
+		assertThatThrownBy(() -> this.repository.saveAndFlush(stale))
 				.isInstanceOf(OptimisticLockingFailureException.class);
 	}
 }

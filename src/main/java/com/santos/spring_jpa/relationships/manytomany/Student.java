@@ -44,12 +44,12 @@ public class Student {
 	}
 
 	public void enroll(Course course) {
-		courses.add(course);
+		this.courses.add(course);
 		course.getStudents().add(this);
 	}
 
 	public void unenroll(Course course) {
-		courses.remove(course);
+		this.courses.remove(course);
 		course.getStudents().remove(this);
 	}
 }

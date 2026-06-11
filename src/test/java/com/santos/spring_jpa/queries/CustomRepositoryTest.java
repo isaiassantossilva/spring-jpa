@@ -20,18 +20,18 @@ class CustomRepositoryTest {
 
 	@BeforeEach
 	void seed() {
-		repository.save(new Employee("Alice", "alice@corp.com", "IT", new BigDecimal("9000.00"), LocalDate.of(2020, 1, 15)));
-		repository.save(new Employee("Bob", "bob@corp.com", "IT", new BigDecimal("5000.00"), LocalDate.of(2021, 3, 10)));
-		repository.save(new Employee("Carol", "carol@corp.com", "HR", new BigDecimal("7000.00"), LocalDate.of(2019, 7, 1)));
+		this.repository.save(new Employee("Alice", "alice@corp.com", "IT", new BigDecimal("9000.00"), LocalDate.of(2020, 1, 15)));
+		this.repository.save(new Employee("Bob", "bob@corp.com", "IT", new BigDecimal("5000.00"), LocalDate.of(2021, 3, 10)));
+		this.repository.save(new Employee("Carol", "carol@corp.com", "HR", new BigDecimal("7000.00"), LocalDate.of(2019, 7, 1)));
 		Employee dave = new Employee("Dave", "dave@corp.com", "HR", new BigDecimal("4000.00"), LocalDate.of(2022, 11, 5));
 		dave.setActive(false);
-		repository.save(dave);
+		this.repository.save(dave);
 	}
 
 	@Test
 	@DisplayName("sem filtros: retorna todos, ordenados por nome")
 	void noFilters() {
-		assertThat(repository.search(null, null, null))
+		assertThat(this.repository.search(null, null, null))
 				.extracting(Employee::getName)
 				.containsExactly("Alice", "Bob", "Carol", "Dave");
 	}
@@ -39,25 +39,25 @@ class CustomRepositoryTest {
 	@Test
 	@DisplayName("filtros individuais sao aplicados so quando informados")
 	void individualFilters() {
-		assertThat(repository.search("IT", null, null)).hasSize(2);
-		assertThat(repository.search(null, new BigDecimal("6000"), null))
+		assertThat(this.repository.search("IT", null, null)).hasSize(2);
+		assertThat(this.repository.search(null, new BigDecimal("6000"), null))
 				.extracting(Employee::getName).containsExactly("Alice", "Carol");
-		assertThat(repository.search(null, null, false))
+		assertThat(this.repository.search(null, null, false))
 				.extracting(Employee::getName).containsExactly("Dave");
 	}
 
 	@Test
 	@DisplayName("filtros combinados")
 	void combinedFilters() {
-		assertThat(repository.search("HR", new BigDecimal("5000"), true))
+		assertThat(this.repository.search("HR", new BigDecimal("5000"), true))
 				.extracting(Employee::getName).containsExactly("Carol");
 	}
 
 	@Test
 	@DisplayName("o fragment convive com os query methods no mesmo repositorio")
 	void fragmentCoexistsWithDerivedQueries() {
-		assertThat(repository.findByDepartment("IT")).hasSize(2);
-		assertThat(repository.search("IT", new BigDecimal("8000"), null))
+		assertThat(this.repository.findByDepartment("IT")).hasSize(2);
+		assertThat(this.repository.search("IT", new BigDecimal("8000"), null))
 				.extracting(Employee::getName).containsExactly("Alice");
 	}
 }

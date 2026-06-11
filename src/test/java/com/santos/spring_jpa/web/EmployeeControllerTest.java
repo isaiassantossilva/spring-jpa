@@ -41,9 +41,9 @@ class EmployeeControllerTest {
 	@Test
 	@DisplayName("GET /api/employees/{id} retorna 200 com o JSON do funcionario")
 	void getByIdReturnsJson() throws Exception {
-		given(service.get(1L)).willReturn(alice);
+		given(this.service.get(1L)).willReturn(this.alice);
 
-		mvc.perform(get("/api/employees/1"))
+		this.mvc.perform(get("/api/employees/1"))
 				.andExpect(status().isOk())
 				.andExpect(jsonPath("$.name").value("Alice"))
 				.andExpect(jsonPath("$.email").value("alice@corp.com"));
@@ -52,19 +52,19 @@ class EmployeeControllerTest {
 	@Test
 	@DisplayName("GET de id inexistente retorna 404")
 	void getMissingReturns404() throws Exception {
-		given(service.get(99L)).willThrow(
+		given(this.service.get(99L)).willThrow(
 				new ResponseStatusException(HttpStatus.NOT_FOUND, "funcionario 99 nao existe"));
 
-		mvc.perform(get("/api/employees/99"))
+		this.mvc.perform(get("/api/employees/99"))
 				.andExpect(status().isNotFound());
 	}
 
 	@Test
 	@DisplayName("POST valido retorna 201 com Location")
 	void postReturns201WithLocation() throws Exception {
-		given(service.create(any())).willReturn(alice);
+		given(this.service.create(any())).willReturn(this.alice);
 
-		mvc.perform(post("/api/employees")
+		this.mvc.perform(post("/api/employees")
 						.contentType(MediaType.APPLICATION_JSON)
 						.content("""
 								{"name": "Alice", "email": "alice@corp.com",
@@ -78,13 +78,13 @@ class EmployeeControllerTest {
 	@Test
 	@DisplayName("POST invalido e barrado pela Bean Validation com 400, sem chegar ao servico")
 	void postInvalidReturns400() throws Exception {
-		mvc.perform(post("/api/employees")
+		this.mvc.perform(post("/api/employees")
 						.contentType(MediaType.APPLICATION_JSON)
 						.content("""
 								{"name": "", "email": "nao-e-email", "salary": -1}
 								"""))
 				.andExpect(status().isBadRequest());
 
-		verifyNoInteractions(service);
+		verifyNoInteractions(this.service);
 	}
 }

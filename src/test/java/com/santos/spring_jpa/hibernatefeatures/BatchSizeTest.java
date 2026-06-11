@@ -37,14 +37,14 @@ class BatchSizeTest {
 			Team team = new Team("Time " + i);
 			team.addPlayer(new Player("Jogador " + i + "A"));
 			team.addPlayer(new Player("Jogador " + i + "B"));
-			repository.save(team);
+			this.repository.save(team);
 		}
-		tem.flush();
-		tem.clear();
+		this.tem.flush();
+		this.tem.clear();
 
-		List<Team> teams = repository.findAll();
+		List<Team> teams = this.repository.findAll();
 
-		Statistics stats = em.getEntityManagerFactory().unwrap(SessionFactory.class).getStatistics();
+		Statistics stats = this.em.getEntityManagerFactory().unwrap(SessionFactory.class).getStatistics();
 		stats.clear();
 
 		// acessar as 3 colecoes dispara UMA query em lote, nao 3

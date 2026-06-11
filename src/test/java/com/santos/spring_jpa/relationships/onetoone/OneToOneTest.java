@@ -24,8 +24,8 @@ class OneToOneTest {
 		Person person = new Person("Maria");
 		person.setPassportLinked(new Passport("BR123456"));
 
-		Person saved = repository.save(person);
-		em.flush();
+		Person saved = this.repository.save(person);
+		this.em.flush();
 
 		assertThat(saved.getPassport().getId()).isNotNull();
 		assertThat(saved.getPassport().getOwner()).isSameAs(saved);
@@ -36,10 +36,10 @@ class OneToOneTest {
 	void findByPassportNumber() {
 		Person person = new Person("Carlos");
 		person.setPassportLinked(new Passport("BR999999"));
-		repository.saveAndFlush(person);
-		em.clear();
+		this.repository.saveAndFlush(person);
+		this.em.clear();
 
-		assertThat(repository.findByPassportNumber("BR999999"))
+		assertThat(this.repository.findByPassportNumber("BR999999"))
 				.isPresent()
 				.get().extracting(Person::getName).isEqualTo("Carlos");
 	}
@@ -49,12 +49,12 @@ class OneToOneTest {
 	void orphanRemoval() {
 		Person person = new Person("Ana");
 		person.setPassportLinked(new Passport("BR777777"));
-		repository.saveAndFlush(person);
+		this.repository.saveAndFlush(person);
 
 		person.setPassportLinked(null);
-		em.flush();
+		this.em.flush();
 
-		Long passports = em.getEntityManager()
+		Long passports = this.em.getEntityManager()
 				.createQuery("select count(p) from Passport p", Long.class)
 				.getSingleResult();
 		assertThat(passports).isZero();

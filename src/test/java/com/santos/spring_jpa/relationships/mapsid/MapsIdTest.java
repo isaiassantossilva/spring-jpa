@@ -26,7 +26,7 @@ class MapsIdTest {
 	void profileSharesPrimaryKey() {
 		AppUser user = new AppUser("zah");
 		user.setProfileLinked(new UserProfile("Estudando JPA"));
-		userRepository.saveAndFlush(user);
+		this.userRepository.saveAndFlush(user);
 
 		assertThat(user.getProfile().getId()).isEqualTo(user.getId());
 	}
@@ -36,10 +36,10 @@ class MapsIdTest {
 	void findProfileByUserId() {
 		AppUser user = new AppUser("maria");
 		user.setProfileLinked(new UserProfile("Backend dev"));
-		userRepository.saveAndFlush(user);
-		em.clear();
+		this.userRepository.saveAndFlush(user);
+		this.em.clear();
 
-		UserProfile profile = profileRepository.findById(user.getId()).orElseThrow();
+		UserProfile profile = this.profileRepository.findById(user.getId()).orElseThrow();
 
 		assertThat(profile.getBio()).isEqualTo("Backend dev");
 		assertThat(profile.getUser().getUsername()).isEqualTo("maria");
@@ -50,9 +50,9 @@ class MapsIdTest {
 	void tableHasSingleKeyColumn() {
 		AppUser user = new AppUser("solo");
 		user.setProfileLinked(new UserProfile("bio"));
-		userRepository.saveAndFlush(user);
+		this.userRepository.saveAndFlush(user);
 
-		Number columns = (Number) em.getEntityManager()
+		Number columns = (Number) this.em.getEntityManager()
 				.createNativeQuery("select count(*) from information_schema.columns "
 						+ "where table_name = 'USER_PROFILES'")
 				.getSingleResult();
